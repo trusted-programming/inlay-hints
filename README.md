@@ -8,6 +8,10 @@ Embed inlay hints of `rust-analyzer` into Rust code without an interactive LSP e
 git submodule sync
 cargo install --path .
 ```
+or
+```bash
+cargo install --git https://github.com/yijunyu/inlay-hints
+```
 
 ## Usage
 With a `folder` containing Rust source code files `*.rs`, run
