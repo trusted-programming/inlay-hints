@@ -245,9 +245,9 @@ fn main() {
         let arg = args.nth(1).unwrap();
         source_folder = arg;
     }
-    let mut output_folder = format!("{source_folder}/inlay-hints");
-    if args.len() >= 3 {
-        let arg = args.nth(2).unwrap();
+    let mut output_folder = format!("./inlay-hints");
+    if args.len() >= 1 {
+        let arg = args.nth(0).unwrap();
         output_folder = arg;
     }
     std::fs::create_dir(&output_folder).ok();
@@ -260,11 +260,18 @@ fn main() {
                 if !is_file_with_ext(&p, "rs") {
                     return;
                 }
-                println!("{}", &p.display());
+                print!("{}", &p.display());
                 if let Ok(s) = std::fs::read_to_string(&p) {
                     let output_file = &p.strip_prefix(&source_folder).unwrap().display();
-                    println!("{}", &output_file);
-                    check(s.as_str(), format!("{output_folder}/{}", output_file));
+                    let output_path = format!("{output_folder}/{}", output_file);
+                    let file_name = std::path::PathBuf::from(&output_path);
+                    if let Some(p) = file_name.parent() {
+                        if !p.exists() {
+                            std::fs::create_dir_all(p).ok();
+                        }
+                    }
+                    println!(" -> {}", &output_path);
+                    check(s.as_str(), output_path);
                 }
             }
         });
