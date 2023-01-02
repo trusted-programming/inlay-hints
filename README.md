@@ -6,8 +6,7 @@ editor such as VSCode or NeoVim.
 ## installation
 
 ```bash
-cd crates/ide
-cargo install --path .
+cargo install --path crates/ide
 ```
 
 # usage

@@ -176,7 +176,7 @@ fn markup(source: &str) -> Vec<u8> {
     let chaining_hints = inlay_hints(CHAINING_HINTS_CONFIG, &source);
     let parameter_hints = inlay_hints(PARAMETER_HINTS_CONFIG, &source);
     let binding_mode_hints = inlay_hints(BINDING_MODE_HINTS_CONFIG, &source);
-    let closing_brace_hints = inlay_hints(CLOSING_BRACE_HINTS_CONFIG, &source);
+    let _closing_brace_hints = inlay_hints(CLOSING_BRACE_HINTS_CONFIG, &source);
     let lifetime_hints = inlay_hints(LIFETIME_HINTS_CONFIG, &source);
     // println!("type hints: {type_hints:?}");
     // println!("chaining hints: {chaining_hints:?}");
@@ -211,11 +211,14 @@ fn markup(source: &str) -> Vec<u8> {
                 output.extend(format!("{}", label).as_bytes());
             }
         }
+        // FIXME -- the end of the range is not always accurate
+        /*
         for (range, label) in &closing_brace_hints {
             if i == usize::from(range.end()){
                 output.extend(format!(" /* {} */", label).as_bytes());
             }
         }
+        */
          output.push(*c);
     }
     output
