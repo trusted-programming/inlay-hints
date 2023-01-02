@@ -1,14 +1,18 @@
-[workspace]
-members = ["rust-analyzer/xtask/", "rust-analyzer/lib/*", "rust-analyzer/crates/*"]
-exclude = ["rust-analyzer/crates/proc-macro-test/imp"]
-
 [package]
 name = "inlay-hints"
 version = "0.0.1"
-description = "Embed inlay hints of `rust-analyzer` into Rust code without interacting with LSP editors."
-license = "Apache-2.0 OR MIT"
 edition = "2021"
-rust-version = "1.65"
+authors = [
+    "Yijun Yu <y.yu@open.ac.uk>",
+]
+description = "Embed inlay hints of `rust-analyzer` into Rust code without interacting with LSP editors."
+repository = "https://github.com/yijunyu/inlay-hints"
+documentation = "https://docs.rs/inlay-hints"
+license = "Apache-2.0"
+
+[workspace]
+members = ["rust-analyzer/xtask/", "rust-analyzer/lib/*", "rust-analyzer/crates/*"]
+exclude = ["rust-analyzer/crates/proc-macro-test/imp"]
 
 [dependencies]
 
@@ -36,4 +40,4 @@ ide-diagnostics = { path = "rust-analyzer/crates/ide-diagnostics", version = "0.
 ide-ssr = { path = "rust-analyzer/crates/ide-ssr", version = "0.0.0" }
 ide-completion = { path = "rust-analyzer/crates/ide-completion", version = "0.0.0" }
 hir = { path = "rust-analyzer/crates/hir", version = "0.0.0" }
-test-utils = { path = "rust-analyzer/crates/test-utils" }
+test-utils = { path = "rust-analyzer/crates/test-utils", version = "0.0.0" }
