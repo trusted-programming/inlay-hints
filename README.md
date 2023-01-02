@@ -29,5 +29,11 @@ be default to the current folder `.`.
 * When the argument `<output-folder>` is not provided, the output folder will
 be default to the `./inlay-hints`.
 
+### Counting inlay hints
+Since the inlay hints are line-based edits to the original source,
+a single recursive diff command could count how many have been inserted:
+```bash
+diff -r <source-folder> <output-folder> | grep "^---" | wc
+```
 ## Updates
 - [ ] to fix: the end marker of a function seems not accurate
