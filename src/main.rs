@@ -225,9 +225,9 @@ fn markup(source: &str) -> Vec<u8> {
     output
 }
 
-pub fn check(input: &str) {
+pub fn check(input: &str, output_file: String) {
     let results = markup(input);
-    println!("{}", String::from_utf8(results).unwrap());
+    std::fs::write(output_file, &results).ok(); 
 }
 
 pub fn is_file_with_ext(p: &Path, file_ext: &str) -> bool {
@@ -240,12 +240,18 @@ pub fn is_file_with_ext(p: &Path, file_ext: &str) -> bool {
 
 fn main() {
     let mut args = std::env::args();
-    let mut folder = ".".to_string();
-    if args.len() == 2 {
+    let mut source_folder = ".".to_string();
+    if args.len() >= 2 {
         let arg = args.nth(1).unwrap();
-        folder = arg;
+        source_folder = arg;
     }
-    WalkDir::new(folder)
+    let mut output_folder = format!("{source_folder}/inlay-hints");
+    if args.len() >= 3 {
+        let arg = args.nth(2).unwrap();
+        output_folder = arg;
+    }
+    std::fs::create_dir(&output_folder).ok();
+    WalkDir::new(&source_folder)
         .sort(true)
         .into_iter()
         .for_each(|entry| {
@@ -254,9 +260,11 @@ fn main() {
                 if !is_file_with_ext(&p, "rs") {
                     return;
                 }
-                println!("{p:?}");
-                if let Ok(s) = std::fs::read_to_string(p) {
-                    check(s.as_str());
+                println!("{}", &p.display());
+                if let Ok(s) = std::fs::read_to_string(&p) {
+                    let output_file = &p.strip_prefix(&source_folder).unwrap().display();
+                    println!("{}", &output_file);
+                    check(s.as_str(), format!("{output_folder}/{}", output_file));
                 }
             }
         });

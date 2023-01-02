@@ -6,19 +6,25 @@ editor such as VSCode or NeoVim.
 ## installation
 
 ```bash
-cargo install --path crates/ide
+git submodule sync
+cargo install --path .
 ```
 
 # usage
 With a `folder` containing Rust source code files `*.rs`, run
 ```bash
-ide [<folder>]
+inlay-hints [<source-folder>] [<output-folder>]
 ```
 
-This command will insert the inferred type declarations, parammeter names,
-chaining types, and lifetime annotations. Any inlay labels produced to LSP
-editor such as Visual Studio Code or NeoVim, can be inserted into the source as
-comments or redundant information of the Rust code.
+From Rust code from `source-folder`, this command will insert `rust-analyzer`
+inlay hint labels, for type declarations, parameter names, chaining types,
+lifetime markers, etc. into the Rust code  saved into the `output-folder`.
+
+When the argument `<output-folder>` is not provided, the output folder will
+be default to the `./inlay-hints` subfolder.
+
+When the argument `<source-folder>` is not provided, the source folder will
+be default to the current folder `.`.
 
 ## Updates
 - [ ] to fix: the end marker of a function seems not accurate
