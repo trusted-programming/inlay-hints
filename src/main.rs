@@ -10,7 +10,10 @@ use syntax::TextRange;
 use test_utils::{extract_annotations, RangeOrOffset};
 
 use jwalk::WalkDir;
-use std::path::Path;
+use std::{
+    path::Path,
+    process::{Command, Stdio},
+};
 
 /// Creates analysis for a single file.
 pub fn file(ra_fixture: &str) -> (Analysis, FileId) {
@@ -261,18 +264,53 @@ fn main() {
                     return;
                 }
                 print!("{}", &p.display());
-                if let Ok(s) = std::fs::read_to_string(&p) {
-                    let output_file = &p.strip_prefix(&source_folder).unwrap().display();
-                    let output_path = format!("{output_folder}/{}", output_file);
-                    let file_name = std::path::PathBuf::from(&output_path);
-                    if let Some(p) = file_name.parent() {
-                        if !p.exists() {
-                            std::fs::create_dir_all(p).ok();
-                        }
+                // grep -v '$0' $p
+                let _grep_command1 = Command::new("grep")
+                    .args(vec![
+                        "-v".to_string(),
+                        "\\$0".to_string(),
+                        (&p.display()).to_string(),
+                    ])
+                    .stdout(Stdio::piped())
+                    .spawn()
+                    .expect("failed grep command");
+                // | grep -v '//- '
+                let _grep_command2 = Command::new("grep")
+                    .args(vec![
+                        "-v".to_string(),
+                        "\\/\\/-".to_string(),
+                    ])
+                    .stdin(_grep_command1.stdout.unwrap())
+                    .stdout(Stdio::piped())
+                    .spawn()
+                    .expect("failed grep command");
+                // | grep -v '^//[^A-Z]*:[^A-Z]*$'
+                let _grep_command3 = Command::new("grep")
+                    .args(vec![
+                        "-v".to_string(),
+                        "^\\/\\/[^A-Z]*:[^A-Z]*$".to_string(),
+                    ])
+                    .stdin(_grep_command2.stdout.unwrap())
+                    .stdout(Stdio::piped())
+                    .spawn()
+                    .expect("failed grep command");
+                // | check
+                let output = _grep_command3
+                    .wait_with_output()
+                    .expect("failed to write to stdout")
+                    .stdout;
+                let s = std::str::from_utf8(&output).unwrap();
+                let output_file = &p.strip_prefix(&source_folder).unwrap().display();
+                let output_path = format!("{output_folder}/{}", output_file);
+                let file_name = std::path::PathBuf::from(&output_path);
+                if let Some(p) = file_name.parent() {
+                    if !p.exists() {
+                        std::fs::create_dir_all(p).ok();
                     }
-                    println!(" -> {}", &output_path);
-                    check(s.as_str(), output_path);
                 }
+                println!(" -> {}", &output_path);
+                std::fs::write("/tmp/t.t", s).ok();
+                check(s, output_path);
             }
         });
 }
