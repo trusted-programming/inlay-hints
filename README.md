@@ -5,7 +5,7 @@ Embed inlay hints of `rust-analyzer` into Rust code without an interactive LSP e
 ## Installation
 
 ```bash
-git submodule sync
+git submodule update
 cargo install --path .
 ```
 or
