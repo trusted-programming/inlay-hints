@@ -1,5 +1,6 @@
 use hir::db::DefDatabase;
 use ide::AdjustmentHints;
+use ide::AdjustmentHintsMode;
 use ide::ClosureReturnTypeHints;
 use ide::DiscriminantHints;
 use ide::{InlayHintsConfig, LifetimeElisionHints};
@@ -120,6 +121,7 @@ pub const DISABLED_CONFIG: InlayHintsConfig = InlayHintsConfig {
     lifetime_elision_hints: LifetimeElisionHints::Never,
     closure_return_type_hints: ClosureReturnTypeHints::Never,
     adjustment_hints: AdjustmentHints::Never,
+    adjustment_hints_mode: AdjustmentHintsMode::Prefix,
     binding_mode_hints: false,
     hide_named_constructor_hints: false,
     hide_closure_initialization_hints: false,
@@ -176,12 +178,12 @@ pub fn inlay_hints(config: InlayHintsConfig, ra_fixture: &str) -> Vec<(TextRange
 
 // insert diagnostic code as an markup element around the code causing the diagnostic message
 fn markup(source: &str) -> Vec<u8> {
-    let type_hints = inlay_hints(TYPE_HINTS_CONFIG, &source);
-    let chaining_hints = inlay_hints(CHAINING_HINTS_CONFIG, &source);
-    let parameter_hints = inlay_hints(PARAMETER_HINTS_CONFIG, &source);
-    let binding_mode_hints = inlay_hints(BINDING_MODE_HINTS_CONFIG, &source);
-    let _closing_brace_hints = inlay_hints(CLOSING_BRACE_HINTS_CONFIG, &source);
-    let lifetime_hints = inlay_hints(LIFETIME_HINTS_CONFIG, &source);
+    let type_hints = inlay_hints(TYPE_HINTS_CONFIG, source);
+    let chaining_hints = inlay_hints(CHAINING_HINTS_CONFIG, source);
+    let parameter_hints = inlay_hints(PARAMETER_HINTS_CONFIG, source);
+    let binding_mode_hints = inlay_hints(BINDING_MODE_HINTS_CONFIG, source);
+    let _closing_brace_hints = inlay_hints(CLOSING_BRACE_HINTS_CONFIG, source);
+    let lifetime_hints = inlay_hints(LIFETIME_HINTS_CONFIG, source);
     // println!("type hints: {type_hints:?}");
     // println!("chaining hints: {chaining_hints:?}");
     // println!("parameter hints: {parameter_hints:?}");
@@ -192,27 +194,27 @@ fn markup(source: &str) -> Vec<u8> {
     for (i, c) in source.as_bytes().iter().enumerate() {
         for (range, label) in &type_hints {
             if i == usize::from(range.end()) {
-                output.extend(format!(": {}", label).as_bytes());
+                output.extend(format!(": {label}").as_bytes());
             }
         }
         for (range, label) in &chaining_hints {
             if i == usize::from(range.end()) {
-                output.extend(format!(" // <- {}", label).as_bytes());
+                output.extend(format!(" // <- {label}").as_bytes());
             }
         }
         for (range, label) in &parameter_hints {
             if i == usize::from(range.start()) {
-                output.extend(format!("{}: ", label).as_bytes());
+                output.extend(format!("{label}: ").as_bytes());
             }
         }
         for (range, label) in &binding_mode_hints {
             if i == usize::from(range.end()) {
-                output.extend(format!(" /* {} */", label).as_bytes());
+                output.extend(format!(" /* {label} */").as_bytes());
             }
         }
         for (range, label) in &lifetime_hints {
             if i == usize::from(range.end()) {
-                output.extend(format!("{}", label).as_bytes());
+                output.extend(label.to_string().as_bytes());
             }
         }
         // FIXME -- the end of the range is not always accurate
@@ -230,7 +232,7 @@ fn markup(source: &str) -> Vec<u8> {
 
 pub fn check(input: &str, output_file: String) {
     let results = markup(input);
-    std::fs::write(output_file, &results).ok(); 
+    std::fs::write(output_file, results).ok(); 
 }
 
 pub fn is_file_with_ext(p: &Path, file_ext: &str) -> bool {
@@ -248,9 +250,9 @@ fn main() {
         let arg = args.nth(1).unwrap();
         source_folder = arg;
     }
-    let mut output_folder = format!("./inlay-hints");
+    let mut output_folder = "./inlay-hints".to_string();
     if args.len() >= 1 {
-        let arg = args.nth(0).unwrap();
+        let arg = args.next().unwrap();
         output_folder = arg;
     }
     std::fs::create_dir(&output_folder).ok();
@@ -269,7 +271,7 @@ fn main() {
                     .args(vec![
                         "-v".to_string(),
                         "\\$0".to_string(),
-                        (&p.display()).to_string(),
+                        p.display().to_string(),
                     ])
                     .stdout(Stdio::piped())
                     .spawn()
@@ -301,7 +303,7 @@ fn main() {
                     .stdout;
                 let s = std::str::from_utf8(&output).unwrap();
                 let output_file = &p.strip_prefix(&source_folder).unwrap().display();
-                let output_path = format!("{output_folder}/{}", output_file);
+                let output_path = format!("{output_folder}/{output_file}");
                 let file_name = std::path::PathBuf::from(&output_path);
                 if let Some(p) = file_name.parent() {
                     if !p.exists() {
