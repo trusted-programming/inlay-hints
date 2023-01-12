@@ -1,34 +1,43 @@
+[package]
+name = "inlay-hints"
+version = "0.0.1"
+edition = "2021"
+authors = [
+    "Yijun Yu <y.yu@open.ac.uk>",
+]
+description = "Embed inlay hints of `rust-analyzer` into Rust code without interacting with LSP editors."
+repository = "https://github.com/yijunyu/inlay-hints"
+documentation = "https://docs.rs/inlay-hints"
+license = "Apache-2.0"
+
 [workspace]
-members = ["xtask/", "lib/*", "crates/*"]
-exclude = ["crates/proc-macro-test/imp"]
+members = ["rust-analyzer/xtask/", "rust-analyzer/lib/*", "rust-analyzer/crates/*"]
+exclude = ["rust-analyzer/crates/proc-macro-test/imp"]
 
-[profile.dev]
-# Disabling debug info speeds up builds a bunch,
-# and we don't rely on it for debugging that much.
-debug = 0
+[dependencies]
 
-[profile.dev.package]
-# These speed up local tests.
-rowan.opt-level = 3
-rustc-hash.opt-level = 3
-smol_str.opt-level = 3
-text-size.opt-level = 3
-# This speeds up `cargo xtask dist`.
-miniz_oxide.opt-level = 3
+cov-mark = "2.0.0-pre.1"
+crossbeam-channel = "0.5.5"
+either = "1.7.0"
+itertools = "0.10.5"
+tracing = "0.1.35"
+oorandom = "11.1.3"
+pulldown-cmark-to-cmark = "10.0.4"
+pulldown-cmark = { version = "0.9.1", default-features = false }
+url = "2.3.1"
+dot = "0.1.4"
+jwalk = "0.8"
 
-[profile.release]
-incremental = true
-# Set this to 1 or 2 to get more useful backtraces in debugger.
-debug = 0
-
-[patch.'crates-io']
-# rowan = { path = "../rowan" }
-
-# chalk-solve = { path = "../chalk/chalk-solve" }
-# chalk-ir = { path = "../chalk/chalk-ir" }
-# chalk-recursive = { path = "../chalk/chalk-recursive" }
-# chalk-derive = { path = "../chalk/chalk-derive" }
-
-# ungrammar = { path = "../ungrammar" }
-
-# salsa = { path = "../salsa" }
+stdx = { path = "rust-analyzer/crates/stdx", version = "0.0.0" }
+syntax = { path = "rust-analyzer/crates/syntax", version = "0.0.0" }
+text-edit = { path = "rust-analyzer/crates/text-edit", version = "0.0.0" }
+ide = { path = "rust-analyzer/crates/ide", version = "0.0.0" }
+ide-db = { path = "rust-analyzer/crates/ide-db", version = "0.0.0" }
+cfg = { path = "rust-analyzer/crates/cfg", version = "0.0.0" }
+profile = { path = "rust-analyzer/crates/profile", version = "0.0.0" }
+ide-assists = { path = "rust-analyzer/crates/ide-assists", version = "0.0.0" }
+ide-diagnostics = { path = "rust-analyzer/crates/ide-diagnostics", version = "0.0.0" }
+ide-ssr = { path = "rust-analyzer/crates/ide-ssr", version = "0.0.0" }
+ide-completion = { path = "rust-analyzer/crates/ide-completion", version = "0.0.0" }
+hir = { path = "rust-analyzer/crates/hir", version = "0.0.0" }
+test-utils = { path = "rust-analyzer/crates/test-utils", version = "0.0.0" }
