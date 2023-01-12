@@ -256,6 +256,22 @@ fn main() {
         output_folder = arg;
     }
     std::fs::create_dir(&output_folder).ok();
+    let n = WalkDir::new(&source_folder)
+        .sort(true)
+        .into_iter()
+        .filter(|entry| {
+            if let Ok(e) = entry {
+                let p = e.path();
+                if !is_file_with_ext(&p, "rs") {
+                    false
+                } else {
+                    true
+                }
+            }
+        })
+        .collect();
+
+    dbg!(&n);
     WalkDir::new(&source_folder)
         .sort(true)
         .into_iter()
