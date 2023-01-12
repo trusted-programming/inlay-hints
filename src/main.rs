@@ -256,6 +256,7 @@ fn main() {
         output_folder = arg;
     }
     std::fs::create_dir(&output_folder).ok();
+    /*
     let n = WalkDir::new(&source_folder)
         .sort(true)
         .into_iter()
@@ -270,8 +271,8 @@ fn main() {
             }
         })
         .collect();
-
-    dbg!(&n);
+        dbg!(&n);
+    */
     WalkDir::new(&source_folder)
         .sort(true)
         .into_iter()
