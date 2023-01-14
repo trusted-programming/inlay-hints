@@ -6,7 +6,7 @@ authors = [
     "Yijun Yu <y.yu@open.ac.uk>",
 ]
 description = "Embed inlay hints of `rust-analyzer` into Rust code without interacting with LSP editors."
-repository = "https://github.com/yijunyu/inlay-hints"
+repository = "https://github.com/trusted-programming/inlay-hints"
 documentation = "https://docs.rs/inlay-hints"
 license = "Apache-2.0"
 
