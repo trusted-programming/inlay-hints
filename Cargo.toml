@@ -41,6 +41,3 @@ ide-ssr = { path = "rust-analyzer/crates/ide-ssr", version = "0.0.0" }
 ide-completion = { path = "rust-analyzer/crates/ide-completion", version = "0.0.0" }
 hir = { path = "rust-analyzer/crates/hir", version = "0.0.0" }
 test-utils = { path = "rust-analyzer/crates/test-utils", version = "0.0.0" }
-
-[dev-dependencies]
-insta = "1.26.0"

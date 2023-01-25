@@ -254,29 +254,12 @@ fn main() {
         let arg = args.nth(1).unwrap();
         source_folder = arg;
     }
-    let mut output_folder = "./inlay-hints".to_string();
-    if args.len() >= 1 {
-        let arg = args.next().unwrap();
-        output_folder = arg;
-    }
+    run(source_folder);
+}
+
+fn run(source_folder: String) {
+    let output_folder = "./inlay-hints".to_string();
     std::fs::create_dir(&output_folder).ok();
-    /*
-    let n = WalkDir::new(&source_folder)
-        .sort(true)
-        .into_iter()
-        .filter(|entry| {
-            if let Ok(e) = entry {
-                let p = e.path();
-                if !is_file_with_ext(&p, "rs") {
-                    false
-                } else {
-                    true
-                }
-            }
-        })
-        .collect();
-        dbg!(&n);
-    */
     WalkDir::new(&source_folder)
         .sort(true)
         .into_iter()
@@ -341,12 +324,24 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use serial_test::serial;
 
     #[test]
-    fn diagnostics() {
-        insta::assert_snapshot!(s, t);
+    fn inlay_hints() {
+        run("tests/src".to_string());
+        let diff_command = Command::new("diff")
+            .args(vec![
+                "-ru".to_string(),
+                "./inlay-hints".to_string(),
+                "./tests/inlay-hints".to_string(),
+            ])
+            .stdout(Stdio::piped())
+            .spawn()
+            .expect("failed diff command");
+        let output = diff_command
+            .wait_with_output()
+            .expect("failed to write to stdout")
+            .stdout;
+        let s = std::str::from_utf8(&output).unwrap();
+        assert_eq!(s, "");
     }
 }
-
-
