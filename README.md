@@ -37,5 +37,12 @@ a single recursive diff command could count how many have been inserted:
 ```bash
 diff -r <source-folder> <output-folder> | grep "^---" | wc
 ```
+
+### Regression tests
+Regression tests on some examples in `tests/src` to `tests/inlay-hints` are added:
+```bash
+cargo test
+```
+
 ## Updates
-- [ ] to fix: the end marker of a function seems not accurate
+- [x] fixed the end marker of a function seems not accurate
