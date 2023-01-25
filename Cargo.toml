@@ -1,9 +1,10 @@
 [package]
 name = "inlay-hints"
-version = "0.0.1"
+version = "0.0.2"
 edition = "2021"
 authors = [
     "Yijun Yu <y.yu@open.ac.uk>",
+    "Tan Lu <tanlu7@huawei.com>",
 ]
 description = "Embed inlay hints of `rust-analyzer` into Rust code without interacting with LSP editors."
 repository = "https://github.com/trusted-programming/inlay-hints"
