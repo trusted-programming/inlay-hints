@@ -182,7 +182,7 @@ fn markup(source: &str) -> Vec<u8> {
     let chaining_hints = inlay_hints(CHAINING_HINTS_CONFIG, source);
     let parameter_hints = inlay_hints(PARAMETER_HINTS_CONFIG, source);
     let binding_mode_hints = inlay_hints(BINDING_MODE_HINTS_CONFIG, source);
-    let _closing_brace_hints = inlay_hints(CLOSING_BRACE_HINTS_CONFIG, source);
+    let closing_brace_hints = inlay_hints(CLOSING_BRACE_HINTS_CONFIG, source);
     let lifetime_hints = inlay_hints(LIFETIME_HINTS_CONFIG, source);
     // println!("type hints: {type_hints:?}");
     // println!("chaining hints: {chaining_hints:?}");
@@ -194,7 +194,11 @@ fn markup(source: &str) -> Vec<u8> {
     for (i, c) in source.as_bytes().iter().enumerate() {
         for (range, label) in &type_hints {
             if i == usize::from(range.end()) {
-                output.extend(format!(": {label}").as_bytes());
+                if !label.contains("unknown") {
+                    output.extend(format!(": {label}").as_bytes());
+                } else {
+                    output.extend(format!("/*: {label} */").as_bytes());
+                }
             }
         }
         for (range, label) in &chaining_hints {
@@ -214,18 +218,18 @@ fn markup(source: &str) -> Vec<u8> {
         }
         for (range, label) in &lifetime_hints {
             if i == usize::from(range.end()) {
-                output.extend(label.to_string().as_bytes());
+                if !label.contains("\'0") {
+                    output.extend(label.to_string().as_bytes());
+                }
             }
         }
         // FIXME -- the end of the range is not always accurate
-        /*
         for (range, label) in &closing_brace_hints {
             if i == usize::from(range.end()){
                 output.extend(format!(" /* {} */", label).as_bytes());
             }
         }
-        */
-         output.push(*c);
+        output.push(*c);
     }
     output
 }
@@ -333,3 +337,16 @@ fn main() {
             }
         });
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serial_test::serial;
+
+    #[test]
+    fn diagnostics() {
+        insta::assert_snapshot!(s, t);
+    }
+}
+
+
