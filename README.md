@@ -37,5 +37,7 @@ a single recursive diff command could count how many have been inserted:
 ```bash
 diff -r <source-folder> <output-folder> | grep "^---" | wc
 ```
-## Updates
-- [ ] to fix: the end marker of a function seems not accurate
+
+## Update
+[Tracking issue](https://github.com/trusted-programming/inlay-hints/issues/2)
+
